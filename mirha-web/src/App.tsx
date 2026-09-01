@@ -25,13 +25,13 @@ function Router() {
     <Switch>
       {/* Admin Routes */}
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin" match="prefix">
+      <Route path="/admin" nest>
         <AdminLayout>
           <Switch>
-            <Route path="/admin" component={AdminDashboard} />
-            <Route path="/admin/properties" component={AdminProperties} />
-            <Route path="/admin/bookings" component={AdminBookings} />
-            <Route path="/admin/inquiries" component={AdminInquiries} />
+            <Route path="/" component={AdminDashboard} />
+            <Route path="/properties" component={AdminProperties} />
+            <Route path="/bookings" component={AdminBookings} />
+            <Route path="/inquiries" component={AdminInquiries} />
             <Route component={NotFound} />
           </Switch>
         </AdminLayout>
