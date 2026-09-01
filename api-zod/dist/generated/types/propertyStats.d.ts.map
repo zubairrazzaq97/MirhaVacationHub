@@ -1,0 +1,1 @@
+{"version":3,"file":"propertyStats.d.ts","sourceRoot":"","sources":["../../../src/generated/types/propertyStats.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AACH,OAAO,KAAK,EAAE,SAAS,EAAE,MAAM,aAAa,CAAC;AAE7C,MAAM,WAAW,aAAa;IAC5B,KAAK,EAAE,MAAM,CAAC;IACd,SAAS,EAAE,MAAM,CAAC;IAClB,QAAQ,EAAE,MAAM,CAAC;IACjB,gBAAgB,EAAE,MAAM,CAAC;IACzB,MAAM,EAAE,SAAS,EAAE,CAAC;CACrB"}
