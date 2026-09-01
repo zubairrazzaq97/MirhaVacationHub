@@ -1,0 +1,767 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Mirha Vacation Homes API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: properties
+    description: Property listings
+  - name: bookings
+    description: Booking management
+  - name: inquiries
+    description: Customer inquiries
+  - name: admin
+    description: Admin operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /properties:
+    get:
+      operationId: listProperties
+      tags: [properties]
+      summary: List all properties
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+        - in: query
+          name: minPrice
+          schema:
+            type: number
+        - in: query
+          name: maxPrice
+          schema:
+            type: number
+        - in: query
+          name: bedrooms
+          schema:
+            type: integer
+        - in: query
+          name: featured
+          schema:
+            type: boolean
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of properties
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Property"
+    post:
+      operationId: createProperty
+      tags: [properties]
+      summary: Create a property (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PropertyInput"
+      responses:
+        "201":
+          description: Created property
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+
+  /properties/featured:
+    get:
+      operationId: listFeaturedProperties
+      tags: [properties]
+      summary: List featured properties for homepage
+      responses:
+        "200":
+          description: Featured properties
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Property"
+
+  /properties/stats:
+    get:
+      operationId: getPropertyStats
+      tags: [properties]
+      summary: Get property stats summary
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyStats"
+
+  /properties/{id}:
+    get:
+      operationId: getProperty
+      tags: [properties]
+      summary: Get a single property
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Property
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateProperty
+      tags: [properties]
+      summary: Update a property (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PropertyUpdate"
+      responses:
+        "200":
+          description: Updated property
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+    delete:
+      operationId: deleteProperty
+      tags: [properties]
+      summary: Delete a property (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /bookings:
+    get:
+      operationId: listBookings
+      tags: [bookings]
+      summary: List all bookings (admin)
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: propertyId
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Submit a booking request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingInput"
+      responses:
+        "201":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/stats:
+    get:
+      operationId: getBookingStats
+      tags: [bookings]
+      summary: Get booking statistics (admin)
+      responses:
+        "200":
+          description: Booking stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingStats"
+
+  /bookings/{id}:
+    get:
+      operationId: getBooking
+      tags: [bookings]
+      summary: Get a booking
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+    patch:
+      operationId: updateBooking
+      tags: [bookings]
+      summary: Update booking status (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingUpdate"
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /inquiries:
+    get:
+      operationId: listInquiries
+      tags: [inquiries]
+      summary: List all inquiries (admin)
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of inquiries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Inquiry"
+    post:
+      operationId: createInquiry
+      tags: [inquiries]
+      summary: Submit a customer inquiry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InquiryInput"
+      responses:
+        "201":
+          description: Inquiry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Inquiry"
+
+  /inquiries/stats:
+    get:
+      operationId: getInquiryStats
+      tags: [inquiries]
+      summary: Get inquiry statistics (admin)
+      responses:
+        "200":
+          description: Inquiry stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InquiryStats"
+
+  /inquiries/{id}:
+    get:
+      operationId: getInquiry
+      tags: [inquiries]
+      summary: Get an inquiry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Inquiry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Inquiry"
+    patch:
+      operationId: updateInquiry
+      tags: [inquiries]
+      summary: Update inquiry status / add reply (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InquiryUpdate"
+      responses:
+        "200":
+          description: Updated inquiry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Inquiry"
+
+  /admin/dashboard:
+    get:
+      operationId: getAdminDashboard
+      tags: [admin]
+      summary: Get admin dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminDashboard"
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCredentials"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          description: Unauthorized
+
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Logged out
+
+  /admin/me:
+    get:
+      operationId: getAdminMe
+      tags: [admin]
+      summary: Get current admin session
+      responses:
+        "200":
+          description: Current admin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          description: Not authenticated
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Property:
+      type: object
+      required: [id, name, type, description, pricePerNight, bedrooms, bathrooms, maxGuests, location, images, amenities, featured, available, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          description: "apartment | villa | room | penthouse"
+        description:
+          type: string
+        pricePerNight:
+          type: number
+        bedrooms:
+          type: integer
+        bathrooms:
+          type: integer
+        maxGuests:
+          type: integer
+        size:
+          type: ["number", "null"]
+          description: Size in sqft
+        location:
+          type: string
+        neighborhood:
+          type: ["string", "null"]
+        images:
+          type: array
+          items:
+            type: string
+        amenities:
+          type: array
+          items:
+            type: string
+        featured:
+          type: boolean
+        available:
+          type: boolean
+        rating:
+          type: ["number", "null"]
+        reviewCount:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+
+    PropertyInput:
+      type: object
+      required: [name, type, description, pricePerNight, bedrooms, bathrooms, maxGuests, location, images, amenities]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        pricePerNight:
+          type: number
+        bedrooms:
+          type: integer
+        bathrooms:
+          type: integer
+        maxGuests:
+          type: integer
+        size:
+          type: ["number", "null"]
+        location:
+          type: string
+        neighborhood:
+          type: ["string", "null"]
+        images:
+          type: array
+          items:
+            type: string
+        amenities:
+          type: array
+          items:
+            type: string
+        featured:
+          type: boolean
+        available:
+          type: boolean
+
+    PropertyUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        pricePerNight:
+          type: number
+        bedrooms:
+          type: integer
+        bathrooms:
+          type: integer
+        maxGuests:
+          type: integer
+        size:
+          type: ["number", "null"]
+        location:
+          type: string
+        neighborhood:
+          type: ["string", "null"]
+        images:
+          type: array
+          items:
+            type: string
+        amenities:
+          type: array
+          items:
+            type: string
+        featured:
+          type: boolean
+        available:
+          type: boolean
+
+    PropertyStats:
+      type: object
+      required: [total, available, featured, avgPricePerNight, byType]
+      properties:
+        total:
+          type: integer
+        available:
+          type: integer
+        featured:
+          type: integer
+        avgPricePerNight:
+          type: number
+        byType:
+          type: array
+          items:
+            $ref: "#/components/schemas/TypeCount"
+
+    TypeCount:
+      type: object
+      required: [type, count]
+      properties:
+        type:
+          type: string
+        count:
+          type: integer
+
+    Booking:
+      type: object
+      required: [id, propertyId, guestName, guestEmail, guestPhone, checkIn, checkOut, guests, totalPrice, status, createdAt]
+      properties:
+        id:
+          type: integer
+        propertyId:
+          type: integer
+        propertyName:
+          type: ["string", "null"]
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+        guestPhone:
+          type: string
+        checkIn:
+          type: string
+        checkOut:
+          type: string
+        guests:
+          type: integer
+        totalPrice:
+          type: number
+        status:
+          type: string
+          description: "pending | confirmed | cancelled | completed"
+        specialRequests:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    BookingInput:
+      type: object
+      required: [propertyId, guestName, guestEmail, guestPhone, checkIn, checkOut, guests]
+      properties:
+        propertyId:
+          type: integer
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+        guestPhone:
+          type: string
+        checkIn:
+          type: string
+        checkOut:
+          type: string
+        guests:
+          type: integer
+        specialRequests:
+          type: ["string", "null"]
+
+    BookingUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+        specialRequests:
+          type: ["string", "null"]
+
+    BookingStats:
+      type: object
+      required: [total, pending, confirmed, cancelled, completed, totalRevenue, thisMonth]
+      properties:
+        total:
+          type: integer
+        pending:
+          type: integer
+        confirmed:
+          type: integer
+        cancelled:
+          type: integer
+        completed:
+          type: integer
+        totalRevenue:
+          type: number
+        thisMonth:
+          type: integer
+
+    Inquiry:
+      type: object
+      required: [id, name, email, subject, message, status, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        subject:
+          type: string
+        message:
+          type: string
+        propertyId:
+          type: ["integer", "null"]
+        propertyName:
+          type: ["string", "null"]
+        status:
+          type: string
+          description: "new | read | replied"
+        adminReply:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    InquiryInput:
+      type: object
+      required: [name, email, subject, message]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        subject:
+          type: string
+        message:
+          type: string
+        propertyId:
+          type: ["integer", "null"]
+
+    InquiryUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+        adminReply:
+          type: ["string", "null"]
+
+    InquiryStats:
+      type: object
+      required: [total, new, read, replied]
+      properties:
+        total:
+          type: integer
+        new:
+          type: integer
+        read:
+          type: integer
+        replied:
+          type: integer
+
+    AdminDashboard:
+      type: object
+      required: [totalProperties, availableProperties, totalBookings, pendingBookings, totalInquiries, newInquiries, totalRevenue, recentBookings, recentInquiries]
+      properties:
+        totalProperties:
+          type: integer
+        availableProperties:
+          type: integer
+        totalBookings:
+          type: integer
+        pendingBookings:
+          type: integer
+        totalInquiries:
+          type: integer
+        newInquiries:
+          type: integer
+        totalRevenue:
+          type: number
+        recentBookings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Booking"
+        recentInquiries:
+          type: array
+          items:
+            $ref: "#/components/schemas/Inquiry"
+
+    AdminCredentials:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    AdminSession:
+      type: object
+      required: [username, loggedIn]
+      properties:
+        username:
+          type: string
+        loggedIn:
+          type: boolean
